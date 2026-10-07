@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Defensores da Democracia vs RaxadinhaMaster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Teko:wght@500;600;700&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #020205;
+            color: #ffffff;
+            font-family: 'Teko', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+        .arcade-font { font-family: 'Press Start 2P', cursive; }
+        .cinzel-font { font-family: 'Cinzel', serif; }
+        
+        /* Premium Glow Effects */
+        .text-glow-gold { text-shadow: 0 0 15px rgba(245, 158, 11, 0.9), 0 0 30px rgba(217, 119, 6, 0.7); }
+        .text-glow-red { text-shadow: 0 0 15px rgba(239, 68, 68, 0.9), 0 0 35px rgba(185, 28, 28, 0.8); }
+        .box-glow-gold { box-shadow: 0 0 20px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(245, 158, 11, 0.2); }
+        .box-glow-red { box-shadow: 0 0 20px rgba(220, 38, 38, 0.4), inset 0 0 15px rgba(220, 38, 38, 0.2); }
+
+        /* Retro CRT Scanline Filter */
+        .scanlines {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(10, 15, 30, 0.92);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(245, 158, 11, 0.5);
+        }
+
+        /* Touch Control Styling */
+        .touch-btn {
+            background: radial-gradient(circle, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 2px solid rgba(245, 158, 11, 0.7);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(6px);
+        }
+        .touch-btn:active {
+            transform: scale(0.92);
+            border-color: #fbbf24;
+            background: rgba(245, 158, 11, 0.3);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center bg-black relative p-0 m-0">
+
+    <!-- GAME WRAPPER CONTAINER -->
+    <div id="game-wrapper" class="relative w-full max-w-6xl h-[100vh] sm:h-[92vh] max-h-[760px] border-0 sm:border-4 border-amber-600/70 sm:rounded-2xl shadow-2xl shadow-amber-950/80 overflow-hidden flex flex-col bg-slate-950">
+        
+        <div class="absolute inset-0 scanlines z-30 pointer-events-none"></div>
+
+        <!-- HUD BAR -->
+        <div id="hud-bar" class="absolute top-0 left-0 w-full p-2 sm:p-4 z-20 flex justify-between items-center pointer-events-none transition-all duration-300">
+            <!-- Player 1 HUD -->
+            <div class="w-5/12 flex flex-col">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="arcade-font text-[10px] sm:text-xs text-amber-400 tracking-wider flex items-center gap-1" data-i18n="p1Name">
+                        🛡️ DEFENSOR
+                    </span>
+                    <span id="player-health-num" class="arcade-font text-[10px] sm:text-xs text-emerald-400">100%</span>
+                </div>
+                <div class="h-5 sm:h-7 w-full bg-slate-950/90 border-2 border-amber-500 rounded-sm overflow-hidden p-0.5 shadow-inner">
+                    <div id="player-health" class="h-full bg-gradient-to-r from-emerald-600 via-emerald-400 to-amber-300 w-full transition-all duration-100"></div>
+                </div>
+            </div>
+
+            <!-- Central Round Timer -->
+            <div class="flex flex-col items-center justify-center -mt-1 mx-2">
+                <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-b from-slate-900 to-black border-2 border-amber-500 rounded-full flex items-center justify-center shadow-lg shadow-amber-900/60">
+                    <span id="timer" class="arcade-font text-lg sm:text-2xl text-amber-400 font-bold">99</span>
+                </div>
+                <span id="diff-badge" class="arcade-font text-[8px] sm:text-[9px] text-amber-300 tracking-widest mt-1 uppercase">MÉDIO</span>
+            </div>
+
+            <!-- Player 2 HUD -->
+            <div class="w-5/12 flex flex-col items-end">
+                <div class="flex justify-between items-center w-full mb-1">
+                    <span id="enemy-health-num" class="arcade-font text-[10px] sm:text-xs text-red-400">100%</span>
+                    <span class="arcade-font text-[10px] sm:text-xs text-red-500 tracking-wider truncate ml-1 flex items-center gap-1" data-i18n="p2Name">
+                        RAXADINHA 😈
+                    </span>
+                </div>
+                <div class="h-5 sm:h-7 w-full bg-slate-950/90 border-2 border-red-600 rounded-sm overflow-hidden p-0.5 shadow-inner">
+                    <div id="enemy-health" class="h-full bg-gradient-to-l from-red-600 via-orange-500 to-amber-400 w-full transition-all duration-100"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COUNTDOWN / FIGHT ANNOUNCEMENT OVERLAY -->
+        <div id="fight-announce" class="hidden absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+            <span id="announce-text" class="arcade-font text-5xl sm:text-7xl font-black text-amber-400 text-glow-gold transition-transform duration-200 transform scale-125">
+                3
+            </span>
+        </div>
+
+        <!-- MAIN CANVAS -->
+        <canvas id="gameCanvas" class="w-full h-full block bg-slate-950"></canvas>
+
+        <!-- START HOME SCREEN -->
+        <div id="start-screen" class="absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-between p-4 sm:p-8 text-center overflow-y-auto">
+            <div class="my-auto max-w-2xl w-full flex flex-col items-center">
+                <div class="inline-block px-4 py-1.5 bg-amber-500/10 border border-amber-500/40 rounded-full mb-3">
+                    <span class="arcade-font text-[10px] sm:text-xs text-amber-400 tracking-widest" data-i18n="subTag">BATALHA NO CONGRESSO NACIONAL</span>
+                </div>
+                
+                <h1 class="cinzel-font text-3xl sm:text-5xl md:text-6xl text-amber-400 font-black tracking-tight text-glow-gold mb-2" data-i18n="mainTitle">
+                    DEFENSORES DA DEMOCRACIA
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-red-500 font-bold tracking-widest mb-4 uppercase text-glow-red" data-i18n="villainSub">
+                    O ATAQUE DE RAXADINHAMASTER
+                </p>
+
+                <!-- Story Briefing Box -->
+                <div class="glass-panel p-4 sm:p-5 rounded-2xl mb-4 text-slate-200 text-sm sm:text-base leading-relaxed text-left shadow-2xl border-amber-500/30">
+                    <p class="mb-2" data-i18n="storyP1">
+                        🏛️ <strong>O Congresso Nacional do Brasil está em chamas!</strong> O perverso RaxadinhaMaster cercou Brasília para destruir a Constituição de 1988 e extinguir os direitos do povo.
+                    </p>
+                    <p class="text-slate-300 text-xs sm:text-sm" data-i18n="storyP2">
+                        Assuma o papel do Defensor da Democracia, encare a batalha na Praça dos Três Poderes, expulse o vilão e restaure o céu azul da nossa pátria!
+                    </p>
+                </div>
+
+                <!-- Difficulty Selector -->
+                <div class="w-full mb-4">
+                    <label class="arcade-font text-xs text-amber-300 mb-2 block tracking-wider" data-i18n="selectDiff">DIFICULDADE DE COMBATE:</label>
+                    <div class="grid grid-cols-3 gap-2 max-w-md mx-auto">
+                        <button data-diff="easy" class="diff-btn arcade-font text-[10px] py-2.5 px-2 rounded-xl border-2 border-slate-700 bg-slate-900 text-emerald-400 transition cursor-pointer hover:border-emerald-500" data-i18n="easy">FÁCIL</button>
+                        <button data-diff="medium" class="diff-btn arcade-font text-[10px] py-2.5 px-2 rounded-xl border-2 border-amber-500 bg-amber-950 text-amber-300 transition cursor-pointer box-glow-gold" data-i18n="medium">MÉDIO</button>
+                        <button data-diff="hard" class="diff-btn arcade-font text-[10px] py-2.5 px-2 rounded-xl border-2 border-slate-700 bg-slate-900 text-red-400 transition cursor-pointer hover:border-red-500" data-i18n="hard">DIFÍCIL</button>
+                    </div>
+                </div>
+
+                <!-- PC Controls Legend -->
+                <div class="hidden sm:grid grid-cols-2 gap-2 text-slate-300 text-xs mb-5 max-w-md bg-slate-900/90 p-3 rounded-xl border border-amber-500/30 text-left">
+                    <div><strong class="text-amber-400">A / D:</strong> <span data-i18n="ctrlMove">Mover Esquerda / Direita</span></div>
+                    <div><strong class="text-amber-400">S:</strong> <span data-i18n="ctrlDef">Agachar / Defesa</span></div>
+                    <div><strong class="text-amber-400">Espaço:</strong> <span data-i18n="ctrlJump">Pulo Vertical</span></div>
+                    <div><strong class="text-amber-400">E:</strong> <span data-i18n="ctrlPunch">Soco Direto</span></div>
+                    <div><strong class="text-amber-400">F:</strong> <span data-i18n="ctrlKick">Chute Frontal</span></div>
+                    <div><strong class="text-amber-400">W:</strong> <span data-i18n="ctrlSpec">Ataque Constitucional</span></div>
+                </div>
+
+                <div class="flex gap-3 w-full max-w-md">
+                    <button id="btn-start-game" class="arcade-font bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 text-slate-950 py-3.5 px-6 rounded-xl font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition shadow-lg shadow-amber-500/40 flex-1 cursor-pointer" data-i18n="startBtn">
+                        INICIAR BATALHA
+                    </button>
+                    <button id="btn-open-options" class="arcade-font bg-slate-800 border-2 border-amber-500/60 text-amber-300 py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm hover:bg-slate-700 transition cursor-pointer" data-i18n="optsBtn">
+                        ⚙️ OPÇÕES
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPTIONS MODAL -->
+        <div id="options-screen" class="hidden absolute inset-0 bg-slate-950/98 z-50 flex flex-col items-center justify-center p-4 sm:p-6 text-center">
+            <div class="max-w-xl w-full glass-panel rounded-2xl p-6 shadow-2xl flex flex-col gap-4 text-left border-amber-500">
+                <div class="flex justify-between items-center border-b border-amber-500/30 pb-3">
+                    <h2 class="arcade-font text-sm sm:text-base text-amber-400" data-i18n="optsTitle">CONFIGURAÇÕES DE JOGO</h2>
+                    <button id="btn-close-options" class="text-slate-400 hover:text-white font-bold text-xl cursor-pointer">✕</button>
+                </div>
+
+                <!-- Language Selector (40 Languages) -->
+                <div>
+                    <label class="arcade-font text-xs text-amber-300 block mb-2" data-i18n="langSelect">IDIOMA (LANGUAGE):</label>
+                    <select id="language-select" class="w-full bg-slate-950 border border-amber-500/60 rounded-xl p-3 text-slate-100 text-sm focus:outline-none focus:border-amber-400 cursor-pointer">
+                        <option value="pt">Português (Brasil)</option>
+                        <option value="en">English (US)</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                        <option value="ja">日本語 (Japanese)</option>
+                        <option value="zh">中文 (Chinese)</option>
+                        <option value="ko">한국어 (Korean)</option>
+                        <option value="ru">Русский (Russian)</option>
+                        <option value="ar">العربية (Arabic)</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="nl">Nederlands</option>
+                        <option value="pl">Polski</option>
+                        <option value="tr">Türkçe</option>
+                        <option value="sv">Svenska</option>
+                        <option value="el">Ελληνικά (Greek)</option>
+                        <option value="he">עברית (Hebrew)</option>
+                        <option value="vi">Tiếng Việt</option>
+                        <option value="th">ไทย (Thai)</option>
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="uk">Українська</option>
+                        <option value="ro">Română</option>
+                        <option value="cs">Čeština</option>
+                        <option value="hu">Magyar</option>
+                        <option value="da">Dansk</option>
+                        <option value="fi">Suomi</option>
+                        <option value="no">Norsk</option>
+                        <option value="ms">Bahasa Melayu</option>
+                        <option value="tl">Tagalog</option>
+                        <option value="bn">বাংলা (Bengali)</option>
+                        <option value="ur">اردو (Urdu)</option>
+                        <option value="fa">فارسی (Persian)</option>
+                        <option value="sw">Kiswahili</option>
+                        <option value="sr">Srpski</option>
+                        <option value="hr">Hrvatski</option>
+                        <option value="bg">Български</option>
+                        <option value="sk">Slovenčina</option>
+                        <option value="ca">Català</option>
+                    </select>
+                </div>
+
+                <!-- Joystick Mode Selection (Mobile) -->
+                <div>
+                    <label class="arcade-font text-xs text-amber-300 block mb-2" data-i18n="joySelect">ESTILO DE JOYSTICK (CELULAR):</label>
+                    <select id="joystick-select" class="w-full bg-slate-950 border border-amber-500/60 rounded-xl p-3 text-slate-100 text-sm focus:outline-none focus:border-amber-400 cursor-pointer">
+                        <option value="classic" data-i18n="joyClassic">DPad Clássico Crux</option>
+                        <option value="compact" data-i18n="joyCompact">Controles Compactos Lado a Lado</option>
+                        <option value="arcade" data-i18n="joyArcade">Botões Grandes Estilo Arcade</option>
+                    </select>
+                </div>
+
+                <div class="mt-2">
+                    <button id="btn-save-options" class="arcade-font bg-amber-500 hover:bg-amber-400 text-slate-950 w-full py-3.5 rounded-xl font-bold text-xs transition cursor-pointer box-glow-gold" data-i18n="saveBtn">
+                        SALVAR E CONTINUAR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- INTRO DIALOGUE CUTSCENE -->
+        <div id="intro-screen" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col justify-between p-4 sm:p-8">
+            <div class="flex justify-between items-center border-b border-amber-500/30 pb-3">
+                <span class="arcade-font text-xs text-amber-400 tracking-widest" data-i18n="introHeader">SALVE O CONGRESCO NACIONAL!</span>
+                <button id="btn-skip-intro" class="text-xs text-slate-400 hover:text-white underline cursor-pointer" data-i18n="skipBtn">Pular [x]</button>
+            </div>
+
+            <div class="my-auto flex flex-col md:flex-row items-center gap-6 max-w-4xl mx-auto w-full">
+                <div id="dialogue-avatar" class="w-28 h-28 sm:w-40 sm:h-40 rounded-2xl border-4 border-amber-500 bg-slate-900 flex items-center justify-center shrink-0 shadow-2xl overflow-hidden relative"></div>
+
+                <div class="flex-1 glass-panel p-5 rounded-2xl relative shadow-2xl">
+                    <h3 id="dialogue-speaker" class="arcade-font text-sm sm:text-base text-amber-400 mb-2">DEFENSOR</h3>
+                    <p id="dialogue-text" class="text-slate-100 text-base sm:text-lg leading-relaxed min-h-[90px]">...</p>
+                    <div class="mt-4 flex justify-end">
+                        <span class="arcade-font text-[10px] text-amber-400 animate-pulse" data-i18n="tapNext">TOQUE PARA CONTINUAR ▶</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center text-slate-500 text-xs" data-i18n="tapHint">Toque na tela para prosseguir</div>
+        </div>
+
+        <!-- END MATCH OVERLAY -->
+        <div id="end-screen" class="hidden absolute inset-0 bg-slate-950/95 z-40 flex flex-col items-center justify-center p-6 text-center">
+            <h2 id="end-title" class="cinzel-font text-4xl sm:text-6xl font-black mb-3 text-glow-gold">VITÓRIA DA DEMOCRACIA</h2>
+            <p id="end-subtitle" class="text-xl sm:text-2xl text-slate-200 mb-8 max-w-xl font-medium">...</p>
+
+            <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+                <button id="btn-restart-game" class="arcade-font bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 px-6 py-4 rounded-xl font-bold text-xs sm:text-sm transition transform hover:scale-105 cursor-pointer shadow-lg shadow-amber-500/30 flex-1" data-i18n="restartBtn">
+                    JOGAR NOVAMENTE
+                </button>
+                <button id="btn-home-screen" class="arcade-font bg-slate-800 text-slate-200 px-6 py-4 rounded-xl font-bold text-xs sm:text-sm transition cursor-pointer border border-slate-600 flex-1" data-i18n="menuBtn">
+                    MENU PRINCIPAL
+                </button>
+            </div>
+        </div>
+
+        <!-- MOBILE TOUCH CONTROLS -->
+        <div id="touch-controls" class="absolute bottom-2 left-0 w-full px-3 py-1 z-30 flex justify-between items-end pointer-events-none select-none sm:hidden">
+            <div id="touch-dpad-container" class="grid grid-cols-3 gap-1 w-36 h-36 pointer-events-auto">
+                <div></div>
+                <button id="t-up" class="touch-btn rounded-t-xl flex items-center justify-center text-amber-400 font-bold text-xl">▲</button>
+                <div></div>
+                <button id="t-left" class="touch-btn rounded-l-xl flex items-center justify-center text-amber-400 font-bold text-xl">◄</button>
+                <button id="t-down" class="touch-btn flex items-center justify-center text-amber-400 font-bold text-xl">▼</button>
+                <button id="t-right" class="touch-btn rounded-r-xl flex items-center justify-center text-amber-400 font-bold text-xl">►</button>
+            </div>
+
+            <div id="touch-actions-container" class="flex gap-2 pointer-events-auto mb-1">
+                <button id="t-punch" class="touch-btn w-14 h-14 rounded-full flex flex-col items-center justify-center border-amber-400">
+                    <span class="arcade-font text-[9px] text-amber-300">E</span>
+                    <span class="text-xs">👊</span>
+                </button>
+                <button id="t-kick" class="touch-btn w-14 h-14 rounded-full flex flex-col items-center justify-center border-emerald-400">
+                    <span class="arcade-font text-[9px] text-emerald-300">F</span>
+                    <span class="text-xs">🦶</span>
+                </button>
+                <button id="t-special" class="touch-btn w-14 h-14 rounded-full flex flex-col items-center justify-center border-sky-400">
+                    <span class="arcade-font text-[8px] text-sky-300">W</span>
+                    <span class="text-xs">⚡</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GAME LOGIC SCRIPT -->
+    <script>
+        class SoundEngine {
+            constructor() { this.ctx = null; }
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+            playPunch() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(35, this.ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.8, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.12);
+            }
+            playKick() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(260, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(25, this.ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(1.0, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.2);
+            }
+            playSpecial() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(280, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(950, this.ctx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.4);
+            }
+            playBlock() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(100, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.08);
+            }
+            playVictory() {
+                if (!this.ctx) return;
+                const notes = [261.63, 329.63, 392.00, 523.25, 659.25];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.12);
+                    gain.gain.setValueAtTime(0.4, this.ctx.currentTime + idx * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + idx * 0.12 + 0.35);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.12);
+                    osc.stop(this.ctx.currentTime + idx * 0.12 + 0.35);
+                });
+            }
+        }
+        const audio = new SoundEngine();
+
+        const translations = {
+            pt: {
+                p1Name: "DEFENSOR", p2Name: "RAXADINHA", subTag: "BATALHA NO CONGRESO NACIONAL",
+                mainTitle: "DEFENSORES DA DEMOCRACIA", villainSub: "O ATAQUE DE RAXADINHAMASTER",
+                storyP1: "🏛️ O Congresso Nacional do Brasil está em chamas! O perverso RaxadinhaMaster cercou Brasília para destruir a Constituição de 1988 e extinguir os direitos do povo.",
+                storyP2: "Assuma o papel do Defensor da Democracia, encare a batalha na Praça dos Três Poderes, expulse o vilão e restaure o céu azul da nossa pátria!",
+                selectDiff: "DIFICULDADE DE COMBATE:", easy: "FÁCIL", medium: "MÉDIO", hard: "DIFÍCIL",
+                ctrlMove: "Mover Esquerda / Direita", ctrlDef: "Agachar / Defesa", ctrlJump: "Pulo Vertical", ctrlPunch: "Soco Direto", ctrlKick: "Chute Frontal", ctrlSpec: "Ataque Constitucional",
+                startBtn: "INICIAR BATALHA", optsBtn: "⚙️ OPÇÕES", optsTitle: "CONFIGURAÇÕES DE JOGO",
+                langSelect: "IDIOMA (LANGUAGE):", joySelect: "ESTILO DE JOYSTICK (CELULAR):",
+                joyClassic: "DPad Clássico Crux", joyCompact: "Controles Compactos Lado a Lado", joyArcade: "Botões Grandes Estilo Arcade",
+                saveBtn: "SALVAR E CONTINUAR", introHeader: "SALVE O CONGRESO NACIONAL!", skipBtn: "Pular [x]",
+                tapNext: "TOQUE PARA CONTINUAR ▶", tapHint: "Toque na tela para prosseguir",
+                restartBtn: "JOGAR NOVAMENTE", menuBtn: "MENU PRINCIPAL",
+                winTitle: "VITÓRIA DA DEMOCRACIA!", winSub: "O Congresso Nacional foi salvo! O céu azul de Brasília volta a brilhar com esperança!",
+                loseTitle: "O CONGRESO CAIU!", loseSub: "RaxadinhaMaster destruiu a Constituição...",
+                d1: "Ahaha! Chegou tarde, Defensor! As torres do Congresso serão destruídas e a Constituição rasgada hoje!",
+                d2: "O Congresso Nacional e a Constituição guardam a liberdade do povo brasileiro e o futuro dos nossos jovens!",
+                d3: "Liberdade?! Bobagem! Vou reduzir as cúpulas do Senado e da Câmara a cinzas!",
+                d4: "Enquanto houver um único cidadão de pé, a Democracia prevalecerá! Em guarda!"
+            },
+            en: {
+                p1Name: "DEFENDER", p2Name: "RAXADINHA", subTag: "NATIONAL CONGRESS BATTLE",
+                mainTitle: "DEFENDERS OF DEMOCRACY", villainSub: "RAXADINHAMASTER'S ATTACK",
+                storyP1: "🏛️ The National Congress of Brazil is in flames! The evil RaxadinhaMaster arrived to tear apart the 1988 Constitution.",
+                storyP2: "Take on the role of Democracy's Defender, fight at the Three Powers Plaza, defeat the villain and restore blue skies!",
+                selectDiff: "COMBAT DIFFICULTY:", easy: "EASY", medium: "MEDIUM", hard: "HARD",
+                ctrlMove: "Move Left / Right", ctrlDef: "Crouch / Guard", ctrlJump: "Vertical Jump", ctrlPunch: "Straight Punch", ctrlKick: "Front Kick", ctrlSpec: "Constitutional Beam",
+                startBtn: "START BATTLE", optsBtn: "⚙️ OPTIONS", optsTitle: "GAME SETTINGS",
+                langSelect: "LANGUAGE:", joySelect: "MOBILE JOYSTICK STYLE:",
+                joyClassic: "Classic Crux DPad", joyCompact: "Compact Side-by-Side Controls", joyArcade: "Arcade Big Buttons",
+                saveBtn: "SAVE & CONTINUE", introHeader: "SAVE THE NATIONAL CONGRESS!", skipBtn: "Skip [x]",
+                tapNext: "TAP TO CONTINUE ▶", tapHint: "Tap screen to proceed",
+                restartBtn: "PLAY AGAIN", menuBtn: "MAIN MENU",
+                winTitle: "DEMOCRATIC VICTORY!", winSub: "The National Congress is saved! Blue skies over Brasilia again!",
+                loseTitle: "CONGRESS HAS FALLEN!", loseSub: "RaxadinhaMaster destroyed the Constitution...",
+                d1: "Bwahaha! You are late, Defender! I will burn down the Congress towers today!",
+                d2: "The Congress and Constitution protect the rights of our people and young generation!",
+                d3: "Rights?! Nonsense! I'll reduce the Senate and Chamber domes to ashes!",
+                d4: "As long as citizenship stands, Democracy wins! Prepare yourself!"
+            },
+            es: {
+                p1Name: "DEFENSOR", p2Name: "RAXADINHA", subTag: "BATALLA EN EL CONGRESO NACIONAL",
+                mainTitle: "DEFENSORES DE LA DEMOCRACIA", villainSub: "EL ATAQUE DE RAXADINHAMASTER",
+                storyP1: "🏛️ ¡El Congreso Nacional de Brasil está en llamas! El malvado RaxadinhaMaster llegó para destruir la Constitución de 1988.",
+                storyP2: "¡Lucha en la Plaza de los Tres Poderes, derrota al villano y devuelve el cielo azul a la nación!",
+                selectDiff: "DIFICULTAD DE COMBATE:", easy: "FÁCIL", medium: "MEDIO", hard: "DIFÍCIL",
+                ctrlMove: "Mover Izq / Der", ctrlDef: "Agacharse / Guardia", ctrlJump: "Salto Vertical", ctrlPunch: "Puñetazo", ctrlKick: "Patada", ctrlSpec: "Ataque Constitucional",
+                startBtn: "INICIAR BATALLA", optsBtn: "⚙️ OPCIONES", optsTitle: "CONFIGURACIÓN DEL JUEGO",
+                langSelect: "IDIOMA:", joySelect: "JOYSTICK MÓVIL:",
+                joyClassic: "DPad Clásico Crux", joyCompact: "Controles Compactos", joyArcade: "Botones Grandes Arcade",
+                saveBtn: "GUARDAR Y CONTINUAR", introHeader: "¡SALVA EL CONGRESO NACIONAL!", skipBtn: "Omitir [x]",
+                tapNext: "TOCA PARA CONTINUAR ▶", tapHint: "Toca la pantalla para avanzar",
+                restartBtn: "JOGAR DE NUEVO", menuBtn: "MENÚ PRINCIPAL",
+                winTitle: "¡VICTORIA DEMOCRÁTICA!", winSub: "¡El Congreso fue salvado! ¡El cielo azul vuelve a brillar!",
+                loseTitle: "¡EL CONGRESO HA CAÍDO!", loseSub: "RaxadinhaMaster destruyó la Constitución...",
+                d1: "¡Jaja! ¡Llegas tarde, Defensor! ¡Destruiré las torres del Congreso hoy!",
+                d2: "¡El Congreso y la Constitución protegen los derechos de nuestro pueblo!",
+                d3: "¡¿Derechos?! ¡Insignificante! ¡Convertiré las cúpulas en cenizas!",
+                d4: "¡Mientras exista ciudadanía, la Democracia prevalecerá! ¡En guardia!"
+            }
+        };
+
+        let currentLang = 'pt';
+        let joystickStyle = 'classic';
+
+        function t(key) {
+            if (translations[currentLang] && translations[currentLang][key]) return translations[currentLang][key];
+            if (translations.pt[key]) return translations.pt[key];
+            if (translations.en[key]) return translations.en[key];
+            return key;
+        }
+
+        function updateLanguageUI() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.dataset.i18n;
+                el.innerText = t(k);
+            });
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const gravity = 0.65;
+        let selectedDifficulty = 'medium';
+        let gameRunning = false;
+        let isCountdownActive = false;
+        let isVictoryState = false;
+        let isKoPhase = false;
+        let timerVal = 99;
+        let timerInterval = null;
+        let screenShake = 0;
+        let projectiles = [];
+
+        const difficultyConfig = {
+            easy: { speed: 2.3, damageMult: 0.7, aggressiveness: 0.02, reactionMs: 500, label: 'FÁCIL' },
+            medium: { speed: 3.5, damageMult: 1.0, aggressiveness: 0.045, reactionMs: 320, label: 'MÉDIO' },
+            hard: { speed: 4.8, damageMult: 1.35, aggressiveness: 0.08, reactionMs: 160, label: 'DIFÍCIL' }
+        };
+
+        // RESTRICTED KEYBOARD CONTROLS (ONLY A, D, S, SPACE, W, E, F)
+        const keys = { a: false, d: false, s: false, ' ': false, w: false, e: false, f: false };
+
+        window.addEventListener('keydown', (evt) => {
+            const k = evt.key.toLowerCase();
+            if (k === ' ') { keys[' '] = true; evt.preventDefault(); }
+            else if (keys.hasOwnProperty(k)) { keys[k] = true; }
+        });
+
+        window.addEventListener('keyup', (evt) => {
+            const k = evt.key.toLowerCase();
+            if (k === ' ') { keys[' '] = false; }
+            else if (keys.hasOwnProperty(k)) { keys[k] = false; }
+        });
+
+        class RealisticFighter {
+            constructor({ position, isEnemy = false, name }) {
+                this.position = position;
+                this.velocity = { x: 0, y: 0 };
+                this.width = 75;
+                this.height = 155;
+                this.isEnemy = isEnemy;
+                this.name = name;
+                this.health = 100;
+                this.isAttacking = false;
+                this.attackType = null;
+                this.attackBox = { position: { x: this.position.x, y: this.position.y }, width: 95, height: 50 };
+                this.isGrounded = false;
+                this.isCrouching = false;
+                this.isBlocking = false;
+                this.facing = isEnemy ? 'left' : 'right';
+                this.attackCooldown = 0;
+                this.hitStun = 0;
+                this.animFrame = 0;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.position.x + this.width / 2, this.position.y + this.height / 2);
+                if (this.facing === 'left') ctx.scale(-1, 1);
+
+                const crouchShift = this.isCrouching ? 30 : 0;
+                this.animFrame += 0.12;
+                const breathe = Math.sin(this.animFrame) * 2.5;
+
+                // Oval Shadow
+                ctx.save();
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.beginPath();
+                ctx.ellipse(0, this.height / 2 - 4, 42, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // Glow Effects
+                ctx.shadowColor = this.isEnemy ? '#ef4444' : '#38bdf8';
+                ctx.shadowBlur = this.isEnemy ? 18 : 14;
+
+                // Flowing Cape
+                ctx.save();
+                const capeGrad = ctx.createLinearGradient(-20, -50, -60, 60);
+                if (this.isEnemy) {
+                    capeGrad.addColorStop(0, '#7f1d1d'); capeGrad.addColorStop(1, '#000000');
+                } else {
+                    capeGrad.addColorStop(0, '#1d4ed8'); capeGrad.addColorStop(1, '#0f172a');
+                }
+                ctx.fillStyle = capeGrad;
+                ctx.beginPath();
+                ctx.moveTo(-12, -45 + crouchShift);
+                ctx.quadraticCurveTo(-50 - Math.sin(this.animFrame) * 10, 0, -40, 60);
+                ctx.lineTo(8, 60);
+                ctx.lineTo(-4, -45 + crouchShift);
+                ctx.fill();
+                ctx.restore();
+
+                // Legs & Boots
+                const legColor = this.isEnemy ? '#111827' : '#0f172a';
+                ctx.fillStyle = legColor;
+                ctx.fillRect(-22, 20 + crouchShift, 18, 48 - crouchShift);
+                ctx.fillRect(6, 20 + crouchShift, 18, 48 - crouchShift);
+
+                ctx.fillStyle = this.isEnemy ? '#450a0a' : '#b45309';
+                ctx.fillRect(-24, 62, 22, 16);
+                ctx.fillRect(4, 62, 22, 16);
+
+                // Torso / Suit Armor
+                ctx.save();
+                const torsoGrad = ctx.createLinearGradient(-25, -45, 25, 25);
+                if (this.isEnemy) {
+                    torsoGrad.addColorStop(0, '#991b1b'); torsoGrad.addColorStop(0.5, '#450a0a'); torsoGrad.addColorStop(1, '#18181b');
+                } else {
+                    torsoGrad.addColorStop(0, '#2563eb'); torsoGrad.addColorStop(0.5, '#1d4ed8'); torsoGrad.addColorStop(1, '#1e3a8a');
+                }
+                ctx.fillStyle = torsoGrad;
+                ctx.fillRect(-24, -45 + crouchShift + breathe, 48, 65 - crouchShift);
+
+                if (!this.isEnemy) {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.beginPath();
+                    ctx.moveTo(-4, -40 + crouchShift + breathe);
+                    ctx.lineTo(4, -40 + crouchShift + breathe);
+                    ctx.lineTo(0, -10 + crouchShift + breathe);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = '#dc2626';
+                    ctx.beginPath();
+                    ctx.moveTo(-24, -45 + crouchShift + breathe);
+                    ctx.lineTo(-34, -60 + crouchShift + breathe);
+                    ctx.lineTo(-18, -35 + crouchShift + breathe);
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                // Realistic Head & Facial Features
+                ctx.save();
+                ctx.fillStyle = this.isEnemy ? '#334155' : '#fcd34d';
+                ctx.beginPath();
+                ctx.arc(0, -58 + crouchShift + breathe, 22, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Glowing Eyes
+                ctx.fillStyle = this.isEnemy ? '#ff0000' : '#ffffff';
+                ctx.shadowColor = this.isEnemy ? '#ff0000' : '#38bdf8';
+                ctx.shadowBlur = 10;
+                ctx.fillRect(4, -62 + crouchShift + breathe, 12, 5);
+
+                // Headband
+                ctx.fillStyle = this.isEnemy ? '#7f1d1d' : '#f59e0b';
+                ctx.fillRect(-22, -72 + crouchShift + breathe, 44, 8);
+                ctx.restore();
+
+                // Arms & Attack Poses
+                ctx.save();
+                ctx.strokeStyle = this.isEnemy ? '#dc2626' : '#60a5fa';
+                ctx.lineWidth = 12;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+
+                if (this.isBlocking) {
+                    ctx.moveTo(-5, -20 + crouchShift); ctx.lineTo(22, -45 + crouchShift);
+                    ctx.moveTo(5, -10 + crouchShift); ctx.lineTo(26, -30 + crouchShift);
+                    ctx.stroke();
+
+                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.arc(28, -30 + crouchShift, 28, -Math.PI / 2, Math.PI / 2);
+                    ctx.stroke();
+                } else if (this.isAttacking) {
+                    if (this.attackType === 'punch') {
+                        ctx.moveTo(-5, -25 + crouchShift); ctx.lineTo(58, -25 + crouchShift);
+                    } else if (this.attackType === 'kick') {
+                        ctx.moveTo(-5, 5); ctx.lineTo(54, 32);
+                    } else if (this.attackType === 'special') {
+                        ctx.moveTo(-5, -25 + crouchShift); ctx.lineTo(42, -40 + crouchShift);
+                    }
+                    ctx.stroke();
+                } else {
+                    ctx.moveTo(-10, -20 + crouchShift); ctx.lineTo(12, 0 + crouchShift);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                ctx.restore();
+            }
+
+            update(groundLevel) {
+                this.position.x += this.velocity.x;
+                this.position.y += this.velocity.y;
+
+                if (this.position.y + this.height + this.velocity.y >= groundLevel) {
+                    this.velocity.y = 0;
+                    this.position.y = groundLevel - this.height;
+                    this.isGrounded = true;
+                } else {
+                    this.velocity.y += gravity;
+                    this.isGrounded = false;
+                }
+
+                if (this.position.x < 10) this.position.x = 10;
+                if (this.position.x + this.width > canvas.width - 10) {
+                    this.position.x = canvas.width - 10 - this.width;
+                }
+
+                this.attackBox.position.x = this.facing === 'right' ? this.position.x + this.width : this.position.x - this.attackBox.width;
+                this.attackBox.position.y = this.position.y + 20;
+
+                if (this.attackCooldown > 0) this.attackCooldown--;
+                if (this.hitStun > 0) this.hitStun--;
+
+                this.draw();
+            }
+
+            attack(type) {
+                if (this.attackCooldown > 0 || this.isBlocking || this.hitStun > 0 || isCountdownActive) return;
+                this.isAttacking = true;
+                this.attackType = type;
+
+                if (type === 'punch') {
+                    audio.playPunch(); this.attackBox.width = 85; this.attackCooldown = 18;
+                } else if (type === 'kick') {
+                    audio.playKick(); this.attackBox.width = 105; this.attackCooldown = 26;
+                } else if (type === 'special') {
+                    audio.playSpecial(); this.attackCooldown = 40;
+                    projectiles.push(new Projectile({
+                        position: { x: this.facing === 'right' ? this.position.x + this.width : this.position.x - 20, y: this.position.y + 40 },
+                        velocity: { x: this.facing === 'right' ? 12 : -12, y: 0 },
+                        isEnemy: this.isEnemy
+                    }));
+                }
+
+                setTimeout(() => { this.isAttacking = false; }, 170);
+            }
+        }
+
+        class Projectile {
+            constructor({ position, velocity, isEnemy }) {
+                this.position = position;
+                this.velocity = velocity;
+                this.isEnemy = isEnemy;
+                this.radius = 20;
+                this.active = true;
+            }
+            draw() {
+                ctx.save();
+                ctx.shadowColor = this.isEnemy ? '#ef4444' : '#38bdf8';
+                ctx.shadowBlur = 25;
+                ctx.fillStyle = this.isEnemy ? '#dc2626' : '#0284c7';
+                ctx.beginPath();
+                ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.position.x, this.position.y, this.radius * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.position.x += this.velocity.x;
+                this.draw();
+                if (this.position.x < 0 || this.position.x > canvas.width) this.active = false;
+            }
+        }
+
+        const player = new RealisticFighter({ position: { x: 150, y: 200 }, isEnemy: false, name: 'Defensor' });
+        const enemy = new RealisticFighter({ position: { x: 650, y: 200 }, isEnemy: true, name: 'RaxadinhaMaster' });
+
+        function drawStage() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            if (isVictoryState) {
+                // Clear Blue Sky with Sun
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+                skyGrad.addColorStop(0, '#0284c7'); skyGrad.addColorStop(0.5, '#38bdf8'); skyGrad.addColorStop(1, '#bae6fd');
+                ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, w, h);
+
+                ctx.save();
+                ctx.shadowColor = '#fef08a'; ctx.shadowBlur = 50; ctx.fillStyle = '#fef08a';
+                ctx.beginPath(); ctx.arc(w * 0.5, h * 0.18, 65, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            } else {
+                // Fiery War Sky (Clean - No random flash sounds)
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+                skyGrad.addColorStop(0, '#020617'); skyGrad.addColorStop(0.4, '#450a0a'); skyGrad.addColorStop(1, '#7f1d1d');
+                ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, w, h);
+            }
+
+            // CONGRESSO NACIONAL BUILDINGS
+            const stageCenter = w / 2;
+            const baseFloor = h * 0.68;
+
+            // Horizontal Slab Platform
+            ctx.fillStyle = isVictoryState ? '#e2e8f0' : '#334155';
+            ctx.fillRect(stageCenter - 320, baseFloor, 640, 24);
+
+            // Twin Towers
+            const towerW = 45;
+            const towerH = 190;
+            const towerY = baseFloor - towerH;
+
+            ctx.fillStyle = isVictoryState ? '#f8fafc' : '#475569';
+            ctx.fillRect(stageCenter - 30, towerY, towerW, towerH);
+            ctx.fillRect(stageCenter + 10, towerY, towerW, towerH);
+
+            // Tower Bridge
+            ctx.fillStyle = isVictoryState ? '#cbd5e1' : '#1e293b';
+            ctx.fillRect(stageCenter - 30, towerY + 45, 85, 18);
+
+            // Window details
+            ctx.fillStyle = isVictoryState ? '#38bdf8' : '#ef4444';
+            for (let y = towerY + 10; y < baseFloor - 10; y += 14) {
+                ctx.fillRect(stageCenter - 24, y, 12, 4);
+                ctx.fillRect(stageCenter + 22, y, 12, 4);
+            }
+
+            // Senate Dome (Downward Convex)
+            const senateX = stageCenter - 180;
+            ctx.fillStyle = isVictoryState ? '#f1f5f9' : '#64748b';
+            ctx.beginPath();
+            ctx.arc(senateX, baseFloor, 55, 0, Math.PI);
+            ctx.fill();
+
+            // Chamber Dome (Upward Concave)
+            const chamberX = stageCenter + 180;
+            ctx.fillStyle = isVictoryState ? '#f1f5f9' : '#64748b';
+            ctx.beginPath();
+            ctx.arc(chamberX, baseFloor, 65, Math.PI, 0);
+            ctx.fill();
+
+            // Central Access Ramp
+            ctx.fillStyle = isVictoryState ? '#cbd5e1' : '#334155';
+            ctx.beginPath();
+            ctx.moveTo(stageCenter - 40, baseFloor + 24);
+            ctx.lineTo(stageCenter + 40, baseFloor + 24);
+            ctx.lineTo(stageCenter + 80, baseFloor + 75);
+            ctx.lineTo(stageCenter - 80, baseFloor + 75);
+            ctx.fill();
+
+            // Brazilian Flag
+            const flagX = stageCenter + 110;
+            ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(flagX, baseFloor - 140); ctx.lineTo(flagX, baseFloor); ctx.stroke();
+            ctx.fillStyle = '#16a34a'; ctx.fillRect(flagX, baseFloor - 140, 36, 22);
+            ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.arc(flagX + 18, baseFloor - 129, 7, 0, Math.PI * 2); ctx.fill();
+
+            // Flames during war
+            if (!isVictoryState) {
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.7)';
+                ctx.beginPath();
+                ctx.arc(senateX + Math.sin(Date.now() * 0.005) * 10, baseFloor - 10, 35, 0, Math.PI * 2);
+                ctx.arc(chamberX + Math.cos(Date.now() * 0.005) * 10, baseFloor - 40, 40, 0, Math.PI * 2);
+                ctx.arc(stageCenter, towerY + 30, 30, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Water Pool & Ground Floor
+            const groundLevel = h * 0.82;
+            const waterGrad = ctx.createLinearGradient(0, baseFloor + 24, 0, groundLevel);
+            if (isVictoryState) {
+                waterGrad.addColorStop(0, '#0284c7'); waterGrad.addColorStop(1, '#0369a1');
+            } else {
+                waterGrad.addColorStop(0, '#450a0a'); waterGrad.addColorStop(1, '#0f172a');
+            }
+            ctx.fillStyle = waterGrad;
+            ctx.fillRect(0, baseFloor + 24, w, groundLevel - (baseFloor + 24));
+
+            ctx.fillStyle = isVictoryState ? '#0f172a' : '#020617';
+            ctx.fillRect(0, groundLevel, w, h - groundLevel);
+        }
+
+        function updateEnemyAI() {
+            if (!gameRunning || isCountdownActive || enemy.hitStun > 0 || isKoPhase) return;
+            const cfg = difficultyConfig[selectedDifficulty];
+            const dist = player.position.x - enemy.position.x;
+            const absDist = Math.abs(dist);
+
+            enemy.facing = dist > 0 ? 'right' : 'left';
+
+            if (absDist > 140) {
+                enemy.velocity.x = enemy.facing === 'right' ? cfg.speed : -cfg.speed;
+                if (Math.random() < cfg.aggressiveness * 0.4) enemy.attack('special');
+            } else {
+                enemy.velocity.x = 0;
+                if (Math.random() < cfg.aggressiveness) {
+                    if (Math.random() < 0.5) enemy.attack('punch');
+                    else enemy.attack('kick');
+                } else if (player.isAttacking && Math.random() < 0.5) {
+                    enemy.isBlocking = true;
+                    setTimeout(() => enemy.isBlocking = false, cfg.reactionMs);
+                }
+            }
+        }
+
+        function handlePlayerInput() {
+            if (!gameRunning || isCountdownActive || player.hitStun > 0 || isKoPhase) {
+                player.velocity.x = 0;
+                return;
+            }
+
+            player.velocity.x = 0;
+
+            if (keys.s) {
+                player.isCrouching = true;
+                player.isBlocking = true;
+            } else {
+                player.isCrouching = false;
+                player.isBlocking = false;
+            }
+
+            if (!player.isCrouching) {
+                if (keys.a) {
+                    player.velocity.x = -5.0; player.facing = 'left';
+                } else if (keys.d) {
+                    player.velocity.x = 5.0; player.facing = 'right';
+                }
+
+                if (keys[' '] && player.isGrounded) {
+                    player.velocity.y = -14.8; player.isGrounded = false;
+                }
+            }
+
+            if (keys.e) { player.attack('punch'); keys.e = false; }
+            else if (keys.f) { player.attack('kick'); keys.f = false; }
+            else if (keys.w) { player.attack('special'); keys.w = false; }
+        }
+
+        function checkCollisions() {
+            if (isCountdownActive || isKoPhase) return;
+
+            if (player.isAttacking && !enemy.isHitThisFrame) {
+                if (isRectCollision(player.attackBox, enemy)) applyDamage(player, enemy);
+            }
+            if (enemy.isAttacking && !player.isHitThisFrame) {
+                if (isRectCollision(enemy.attackBox, player)) applyDamage(enemy, player);
+            }
+            projectiles.forEach((proj) => {
+                if (!proj.active) return;
+                const target = proj.isEnemy ? player : enemy;
+                if (
+                    proj.position.x > target.position.x &&
+                    proj.position.x < target.position.x + target.width &&
+                    proj.position.y > target.position.y &&
+                    proj.position.y < target.position.y + target.height
+                ) {
+                    proj.active = false;
+                    applyDamage({ attackType: 'special', isEnemy: proj.isEnemy }, target, 22);
+                }
+            });
+        }
+
+        function isRectCollision(r1, r2) {
+            return (
+                r1.position.x < r2.position.x + r2.width &&
+                r1.position.x + r1.width > r2.position.x &&
+                r1.position.y < r2.position.y + r2.height &&
+                r1.position.y + r1.height > r2.position.y
+            );
+        }
+
+        function applyDamage(attacker, defender, customDamage = null) {
+            defender.isHitThisFrame = true;
+            const cfg = difficultyConfig[selectedDifficulty];
+
+            let damage = customDamage;
+            if (!damage) {
+                if (attacker.attackType === 'punch') damage = 10;
+                if (attacker.attackType === 'kick') damage = 15;
+                if (attacker.attackType === 'special') damage = 22;
+            }
+            if (attacker.isEnemy) damage *= cfg.damageMult;
+
+            if (defender.isBlocking) {
+                damage = Math.floor(damage * 0.2); audio.playBlock();
+            } else {
+                defender.hitStun = 15; screenShake = 14; audio.playPunch();
+                defender.velocity.x = attacker.facing === 'right' ? 8 : -8;
+            }
+
+            defender.health = Math.max(0, defender.health - damage);
+            updateUI();
+            setTimeout(() => defender.isHitThisFrame = false, 180);
+
+            if (defender.health <= 0) endMatch(attacker === player || !attacker.isEnemy);
+        }
+
+        function updateUI() {
+            document.getElementById('player-health').style.width = player.health + '%';
+            document.getElementById('enemy-health').style.width = enemy.health + '%';
+            document.getElementById('player-health-num').innerText = Math.ceil(player.health) + '%';
+            document.getElementById('enemy-health-num').innerText = Math.ceil(enemy.health) + '%';
+        }
+
+        function applyJoystickStyle(style) {
+            joystickStyle = style;
+            const dpad = document.getElementById('touch-dpad-container');
+            const actions = document.getElementById('touch-actions-container');
+
+            if (style === 'compact') {
+                dpad.className = 'grid grid-cols-3 gap-1 w-28 h-28 pointer-events-auto';
+                actions.className = 'flex gap-1 pointer-events-auto mb-1';
+            } else if (style === 'arcade') {
+                dpad.className = 'grid grid-cols-3 gap-1 w-40 h-40 pointer-events-auto';
+                actions.className = 'flex gap-3 pointer-events-auto mb-1 scale-110 origin-bottom-right';
+            } else {
+                dpad.className = 'grid grid-cols-3 gap-1 w-36 h-36 pointer-events-auto';
+                actions.className = 'flex gap-2 pointer-events-auto mb-1';
+            }
+        }
+
+        function bindTouchControls() {
+            const bind = (id, keyName) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; });
+                btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+            };
+            bind('t-up', ' ');
+            bind('t-down', 's');
+            bind('t-left', 'a');
+            bind('t-right', 'd');
+            bind('t-punch', 'e');
+            bind('t-kick', 'f');
+            bind('t-special', 'w');
+        }
+        bindTouchControls();
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            if (screenShake > 0) {
+                ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+                screenShake *= 0.88; if (screenShake < 0.4) screenShake = 0;
+            }
+
+            drawStage();
+
+            if (gameRunning) {
+                handlePlayerInput();
+                updateEnemyAI();
+                checkCollisions();
+            }
+
+            const groundLevel = canvas.height * 0.82;
+            player.update(groundLevel);
+            enemy.update(groundLevel);
+
+            projectiles = projectiles.filter(p => p.active);
+            projectiles.forEach(p => p.update());
+
+            ctx.restore();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function runCountdown(callback) {
+            isCountdownActive = true;
+            const announceBox = document.getElementById('fight-announce');
+            const announceText = document.getElementById('announce-text');
+            announceBox.classList.remove('hidden');
+
+            const steps = ["3", "2", "1", "FIGHT!"];
+            let stepIdx = 0;
+
+            const stepTimer = setInterval(() => {
+                if (stepIdx < steps.length) {
+                    announceText.innerText = steps[stepIdx];
+                    announceText.className = steps[stepIdx] === "FIGHT!" ? 
+                        "arcade-font text-6xl sm:text-8xl font-black text-red-500 text-glow-red scale-150 animate-bounce" :
+                        "arcade-font text-5xl sm:text-7xl font-black text-amber-400 text-glow-gold scale-125";
+                    stepIdx++;
+                } else {
+                    clearInterval(stepTimer);
+                    announceBox.classList.add('hidden');
+                    isCountdownActive = false;
+                    if (callback) callback();
+                }
+            }, 800);
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerVal = 99;
+            document.getElementById('timer').innerText = timerVal;
+            timerInterval = setInterval(() => {
+                if (!gameRunning || isCountdownActive || isKoPhase) return;
+                timerVal--;
+                document.getElementById('timer').innerText = timerVal;
+                if (timerVal <= 0) endMatch(player.health >= enemy.health);
+            }, 1000);
+        }
+
+        let dialogueIndex = 0;
+        function getDialogueData() {
+            return [
+                { speaker: t('p2Name'), symbol: "😈", color: "#ef4444", text: t('d1') },
+                { speaker: t('p1Name'), symbol: "🛡️", color: "#38bdf8", text: t('d2') },
+                { speaker: t('p2Name'), symbol: "🔥", color: "#ef4444", text: t('d3') },
+                { speaker: t('p1Name'), symbol: "⚖️", color: "#38bdf8", text: t('d4') }
+            ];
+        }
+
+        function showDialogue() {
+            const list = getDialogueData();
+            if (dialogueIndex >= list.length) {
+                document.getElementById('intro-screen').classList.add('hidden');
+                resetMatch();
+                return;
+            }
+            const d = list[dialogueIndex];
+            document.getElementById('dialogue-speaker').innerText = d.speaker;
+            document.getElementById('dialogue-speaker').style.color = d.color;
+            document.getElementById('dialogue-text').innerText = `"${d.text}"`;
+            document.getElementById('dialogue-avatar').innerHTML = `<span class="text-6xl">${d.symbol}</span>`;
+            document.getElementById('dialogue-avatar').style.borderColor = d.color;
+        }
+
+        document.getElementById('intro-screen').addEventListener('click', () => { dialogueIndex++; showDialogue(); });
+        document.getElementById('btn-skip-intro').addEventListener('click', (e) => {
+            e.stopPropagation(); dialogueIndex = 99; showDialogue();
+        });
+
+        function resetMatch() {
+            player.health = 100; enemy.health = 100;
+            player.position = { x: 140, y: 200 };
+            enemy.position = { x: canvas.width - 220, y: 200 };
+            player.velocity = { x: 0, y: 0 };
+            enemy.velocity = { x: 0, y: 0 };
+            projectiles = []; isVictoryState = false; isKoPhase = false;
+            updateUI(); gameRunning = true;
+            
+            runCountdown(() => {
+                startTimer();
+            });
+        }
+
+        function endMatch(playerWon) {
+            isKoPhase = true;
+            gameRunning = false;
+            clearInterval(timerInterval);
+
+            // Display K.O. overlay
+            const announceBox = document.getElementById('fight-announce');
+            const announceText = document.getElementById('announce-text');
+            announceText.innerText = "K.O.!";
+            announceText.className = "arcade-font text-6xl sm:text-8xl font-black text-red-600 text-glow-red animate-pulse";
+            announceBox.classList.remove('hidden');
+
+            if (playerWon) {
+                isVictoryState = true;
+                audio.playVictory();
+            }
+
+            // 3.5 SECONDS DRAMATIC DELAY
+            setTimeout(() => {
+                announceBox.classList.add('hidden');
+                const endScreen = document.getElementById('end-screen');
+                const endTitle = document.getElementById('end-title');
+                const endSub = document.getElementById('end-subtitle');
+
+                if (playerWon) {
+                    endTitle.innerText = t('winTitle');
+                    endSub.innerText = t('winSub');
+                    endTitle.className = "cinzel-font text-3xl sm:text-5xl font-black mb-3 text-amber-400 text-glow-gold";
+                } else {
+                    endTitle.innerText = t('loseTitle');
+                    endSub.innerText = t('loseSub');
+                    endTitle.className = "cinzel-font text-3xl sm:text-5xl font-black mb-3 text-red-600 text-glow-red";
+                }
+                endScreen.classList.remove('hidden');
+            }, 3500);
+        }
+
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.diff-btn').forEach(b => {
+                    b.className = 'diff-btn arcade-font text-[10px] py-2.5 px-2 rounded-xl border-2 border-slate-700 bg-slate-900 text-slate-400 transition cursor-pointer';
+                });
+                selectedDifficulty = btn.dataset.diff;
+                btn.className = 'diff-btn arcade-font text-[10px] py-2.5 px-2 rounded-xl border-2 border-amber-500 bg-amber-950 text-amber-300 transition cursor-pointer box-glow-gold';
+                document.getElementById('diff-badge').innerText = difficultyConfig[selectedDifficulty].label;
+            });
+        });
+
+        document.getElementById('btn-start-game').addEventListener('click', () => {
+            audio.init();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('intro-screen').classList.remove('hidden');
+            dialogueIndex = 0; showDialogue();
+        });
+
+        document.getElementById('btn-open-options').addEventListener('click', () => {
+            document.getElementById('options-screen').classList.remove('hidden');
+        });
+
+        document.getElementById('btn-close-options').addEventListener('click', () => {
+            document.getElementById('options-screen').classList.add('hidden');
+        });
+
+        document.getElementById('btn-save-options').addEventListener('click', () => {
+            currentLang = document.getElementById('language-select').value;
+            applyJoystickStyle(document.getElementById('joystick-select').value);
+            updateLanguageUI();
+            document.getElementById('options-screen').classList.add('hidden');
+        });
+
+        document.getElementById('btn-restart-game').addEventListener('click', () => {
+            document.getElementById('end-screen').classList.add('hidden');
+            resetMatch();
+        });
+
+        document.getElementById('btn-home-screen').addEventListener('click', () => {
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        });
+
+        window.onload = () => {
+            updateLanguageUI();
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
